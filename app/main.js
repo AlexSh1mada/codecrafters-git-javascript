@@ -42,17 +42,9 @@ function readBlob(objectSha) {
   const compressedData = fs.readFileSync(objectFile);
 
   // Decompress the object file using zlib
-  zlib.inflate(compressedData, (err, decompressedData) => {
-      if (err) {
-          throw new Error(`Failed to decompress blob object: ${err.message}`);
-      }
+  const decompressedData = zlib.inflateSync(compressedData);
+  const response = decompressedData.toString().split('\x00')[1];
 
-      // Convert Buffer to string and split to get the header and content
-      const decompressedString = decompressedData.toString();
-      const nullCharIndex = decompressedString.indexOf('\0');
-      const content = decompressedString.slice(nullCharIndex + 1);
-
-      // Print the content to stdout
-      process.stdout.write(content);  // Use write to avoid adding a newline
-  });
+  // Print the response without adding a new line
+  process.stdout.write(response);
 }
